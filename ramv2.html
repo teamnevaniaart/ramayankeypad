@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ramayan Keypad (JSON Version)</title>
+  <style>
+    body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+    #display { width: 300px; height: 50px; border: 2px solid #444; margin-bottom: 10px; font-size: 24px; text-align: right; padding: 10px; border-radius: 10px; }
+    #verseBox { width: 300px; height: 180px; border: 2px solid #444; overflow-y: auto; margin: 10px 0; padding: 10px; font-size: 18px; border-radius: 10px; }
+    .keypad { display: grid; grid-template-columns: repeat(3, 100px); grid-gap: 10px; }
+    button { font-size: 24px; padding: 20px; border-radius: 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Ramayan Keypad</h1>
+  <div id="display"></div>
+  <div id="verseBox">Shloka / Story will appear here...</div>
+  <div class="keypad">
+    <button onclick="press(1)">1</button>
+    <button onclick="press(2)">2</button>
+    <button onclick="press(3)">3</button>
+    <button onclick="press(4)">4</button>
+    <button onclick="press(5)">5</button>
+    <button onclick="press(6)">6</button>
+    <button onclick="press(7)">7</button>
+    <button onclick="press(8)">8</button>
+    <button onclick="press(9)">9</button>
+    <button onclick="clearDisplay()">❌</button>
+    <button onclick="press(0)">0</button>
+    <button onclick="submit()">✔</button>
+  </div>
+
+  <script>
+    let input = "";
+    let verses = {};
+
+    // Load JSON on startup
+    fetch("ramayan.json")
+      .then(response => response.json())
+      .then(data => { verses = data; })
+      .catch(error => console.error("Error loading verses:", error));
+
+    const display = document.getElementById('display');
+    const verseBox = document.getElementById('verseBox');
+
+    function press(num) {
+      input += num;
+      display.textContent = input;
+    }
+
+    function clearDisplay() {
+      input = "";
+      display.textContent = "";
+      verseBox.textContent = "Shloka / Story will appear here...";
+    }
+
+    function submit() {
+      if (verses[input]) {
+        verseBox.textContent = verses[input].en;
+        const utter = new SpeechSynthesisUtterance(verses[input].hi);
+        utter.lang = "hi-IN";
+        speechSynthesis.speak(utter);
+      } else {
+        verseBox.textContent = "Shloka not found.";
+      }
+    }
+  </script>
+</body>
+</html>
